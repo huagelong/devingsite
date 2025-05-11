@@ -8,7 +8,7 @@ export default antfu(
       'no-unused-vars': 'off',
       'no-undef': 'off',
       'no-debugger': 'warn',
-      'no-console': 'warn',
+      'no-console': 'off',
       'curly': 'off',
       'node/prefer-global/process': 'off',
       'unused-imports/no-unused-vars': 'warn',

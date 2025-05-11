@@ -1,10 +1,11 @@
-import { access, constants, copyFile } from 'fs';
+import { access, constants, copyFile } from 'node:fs'
 
 access('.env', constants.F_OK, (err) => {
   if (err) {
     copyFile('.env.example', '.env', (err) => {
-      if (err) throw err;
-      console.log('.env.example was copied to .env');
-    });
+      if (err)
+        throw err
+      console.log('.env.example was copied to .env')
+    })
   }
-});
+})
