@@ -33,8 +33,8 @@ async function getConfig(nuxtApp) {
     const runtimeConfig = useRuntimeConfig()
     return {
       baseURL: runtimeConfig.public.baseURL,
-      appId: runtimeConfig.app.appId,
-      appSecret: runtimeConfig.app.appSecret,
+      appId: runtimeConfig.custom.appId,
+      appSecret: runtimeConfig.custom.appSecret,
       defaultLang: 'zh_CN',
     }
   })

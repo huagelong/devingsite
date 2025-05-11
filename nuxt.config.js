@@ -6,9 +6,9 @@ export default defineNuxtConfig({
     public: {
       baseURL: process.env.NUXT_PUBLIC_BASE_URL,
     },
-    app: {
-      appId: process.env.NUXT_APP_ID,
-      appSecret: process.env.NUXT_APP_SECRET,
+    custom: {
+      appId: process.env.NUXT_CUSTOM_APP_ID,
+      appSecret: process.env.NUXT_CUSTOM_APP_SECRET,
     },
   },
   ssr: true,
