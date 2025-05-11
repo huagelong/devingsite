@@ -5,10 +5,10 @@
   "scripts": {
     "build": "nuxt build --dotenv .env.production",
     "build:docker": "nuxt build --dotenv .env.docker",
-    "dev": "nuxt dev  --dotenv .env.local",
+    "dev": "nuxt dev  --dotenv .env",
     "generate": "nuxt generate",
     "preview": "nuxt preview --dotenv .env.production",
-    "postinstall": "nuxt prepare",
+    "postinstall": "nuxt prepare && node ./scripts/postinstall.js",
     "lint": "npx --no-warnings eslint --max-warnings=0 .",
     "lint:fix": "npx --no-warnings eslint  --max-warnings=0 . --fix",
     "ncu": "ncu -u"
