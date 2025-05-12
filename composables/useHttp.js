@@ -71,7 +71,7 @@ async function getToken(nuxtApp) {
         return null
       }
 
-      const langCookie = useCookie('language')
+      const langCookie = await nuxtApp.runWithContext(async () => useCookie('language'))
       const language = langCookie.value || config.defaultLang
 
       let response
@@ -89,7 +89,7 @@ async function getToken(nuxtApp) {
         })
       }
       else {
-        const { data } = await useFetch('/api/getToken', {
+        const { data } = await nuxtApp.runWithContext(async () => useFetch('/api/getToken', {
           baseURL: config.baseURL,
           method: 'GET',
           params: {
@@ -100,7 +100,7 @@ async function getToken(nuxtApp) {
             language,
           },
           key: 'server:getToken',
-        })
+        }))
         response = data.value
       }
 
@@ -178,7 +178,7 @@ async function applyOptions(nuxtApp, options = {}) {
     options.timeout = 3000
 
     // 确保useCookie在正确的上下文中调用
-    const langCookie = useCookie('language')
+    const langCookie = await nuxtApp.runWithContext(async () => useCookie('language'))
     const language = langCookie.value || config.defaultLang
 
     let headers = {
@@ -199,7 +199,7 @@ async function applyOptions(nuxtApp, options = {}) {
     }
 
     if (useHelper.isServer()) {
-      const serverHeaders = useRequestHeaders(['referer', 'cookie'])
+      const serverHeaders = await nuxtApp.runWithContext(async () => useRequestHeaders(['referer', 'cookie']))
       headers = { ...headers, ...serverHeaders }
     }
 
@@ -224,17 +224,8 @@ function createThrottleWithContext(nuxtApp) {
 }
 
 function handleError(nuxtApp, response) {
-  // 创建带上下文的工具函数
-  // 增强版上下文绑定
-  const withContext = function (fn) {
-    return function (...args) {
-      const contextApp = nuxtApp
-      return contextApp.runWithContext(() => fn.call(this, contextApp, ...args))
-    }
-  }
-
   // 带上下文的错误显示
-  const showError = withContext(async (nuxtApp, text) => {
+  const showError = async (text) => {
     if (useHelper.isClient()) {
       const Arco = await import('@arco-design/web-vue')
       Arco.Message.error(text || '未知错误')
@@ -242,17 +233,17 @@ function handleError(nuxtApp, response) {
     else {
       console.error('服务端错误:', text)
     }
-  })
+  }
 
   // 带上下文的清理token
-  const clearTokens = withContext((nuxtApp) => {
+  const clearTokens = (nuxtApp) => {
     nuxtApp.runWithContext(() => {
       const tokenCookie = useCookie('token')
       const expireCookie = useCookie('token_expire')
       tokenCookie.value = null
       expireCookie.value = null
     })
-  })
+  }
 
   // 创建带上下文的节流实例
   const throttle = createThrottleWithContext(nuxtApp)
@@ -294,10 +285,10 @@ async function fetch(nuxtApp, key, url, options) {
           handleError(nuxtApp, response)
       }
       else {
-        const { data } = await useFetch(url, {
+        const { data } = await nuxtApp.runWithContext(async () => useFetch(url, {
           ...options,
           transform: res => ({ ...res, fetchedAt: new Date() }),
-        })
+        }))
         response = data.value
         if (response?.code !== 0)
           handleError(nuxtApp, response)
