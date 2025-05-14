@@ -58,7 +58,7 @@ async function fetch(key, url, options) {
   try {
     options = await applyOptions({ ...options, key })
     let response
-
+    console.log(useHelper.isClient())
     if (useHelper.isClient()) {
       response = await $fetch(url, options)
       if (response?.code !== 0)

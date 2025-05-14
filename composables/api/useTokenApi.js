@@ -3,8 +3,8 @@ export function useTokenApi() {
     const runtimeConfig = useRuntimeConfig()
     return {
       baseURL: runtimeConfig.public.baseURL,
-      appId: runtimeConfig.custom.appId,
-      appSecret: runtimeConfig.custom.appSecret,
+      appId: runtimeConfig.public.appId,
+      appSecret: runtimeConfig.public.appSecret,
       defaultLang: 'zh_CN',
     }
   }
@@ -141,6 +141,7 @@ export function useTokenApi() {
 
     // 确保useCookie在正确的上下文中调用
     const langCookie = useCookie('language')
+    console.log(langCookie)
     const language = langCookie.value || config.defaultLang
 
     let headers = {

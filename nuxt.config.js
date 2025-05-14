@@ -1,12 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 console.log('process.argv: ', process.argv)
-console.log('process.env.NODE_ENV: ', process.env.NODE_ENV)
+console.log('process.env: ', process.env)
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       baseURL: process.env.NUXT_PUBLIC_BASE_URL,
-    },
-    custom: {
       appId: process.env.NUXT_CUSTOM_APP_ID,
       appSecret: process.env.NUXT_CUSTOM_APP_SECRET,
     },
@@ -66,7 +64,8 @@ export default defineNuxtConfig({
   imports: {
     autoImport: true,
     dirs: [
-      'stores',
+      'stores/**',
+      'composables/**',
     ],
   },
 
