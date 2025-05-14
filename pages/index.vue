@@ -1,10 +1,9 @@
 <script setup>
 import { Message } from '@arco-design/web-vue'
-import { test } from '../api/test'
 
 const isLoading = ref(false)
 const helloWord = ref('')
-
+const { test } = useTestApi()
 async function handleExperienceClick() {
   try {
     isLoading.value = true
@@ -19,7 +18,7 @@ async function handleExperienceClick() {
   }
 }
 
-const { data: res } = await useAsyncData('test_key', () => test())
+const res = await test({})
 helloWord.value = res?.data
 
 useSeoMeta({
