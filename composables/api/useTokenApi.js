@@ -9,6 +9,19 @@ export function useTokenApi() {
     }
   }
 
+  async function getMyCookie(cookieKey) {
+    if (useHelper.isClient()) {
+      const token = useCookie(cookieKey)
+      return token
+    }
+    else {
+      const { $requestContext } = useNuxtApp()
+      const serverToken = getCookie($requestContext.event, cookieKey)
+      token.value = serverToken // 同步到客户端
+      return token
+    }
+  }
+
   async function getMD5() {
     const CryptoJS = await import('crypto-js')
     return CryptoJS.MD5
@@ -23,14 +36,14 @@ export function useTokenApi() {
   }
 
   async function getToken() {
-    const tokenCookie = useCookie('token')
-    const expireCookie = useCookie('token_expire')
+    const tokenCookie = await getMyCookie('token')
+    const expireCookie = await getMyCookie('token_expire')
 
     if (tokenCookie.value && expireCookie.value) {
       const expireTime = Number.parseInt(expireCookie.value)
       if (Date.now() < expireTime - 60000)
         return tokenCookie.value
-      return await refreshToken(nuxtApp, tokenCookie.value)
+      return await refreshToken(tokenCookie.value)
     }
     const config = await getConfig()
     const signatureParams = await generateSignature(config.appSecret)
@@ -41,7 +54,7 @@ export function useTokenApi() {
       }
       return null
     }
-    const langCookie = useCookie('language')
+    const langCookie = await getMyCookie('language')
     const language = langCookie.value || config.defaultLang
 
     let response
@@ -83,11 +96,11 @@ export function useTokenApi() {
   }
 
   async function refreshToken(currentToken) {
-    // 确保useCookie在正确的上下文中调用
-    const tokenCookie = useCookie('token')
-    const expireCookie = useCookie('token_expire')
-    const langCookie = useCookie('language')
-    const config = await getConfig(nuxtApp)
+    // 确保await getMyCookie在正确的上下文中调用
+    const tokenCookie = await getMyCookie('token')
+    const expireCookie = await getMyCookie('token_expire')
+    const langCookie = await getMyCookie('language')
+    const config = await getConfig()
     const language = langCookie.value || config.defaultLang
 
     let response
@@ -124,9 +137,9 @@ export function useTokenApi() {
     return currentToken
   }
 
-  const clearTokens = () => {
-    const tokenCookie = useCookie('token')
-    const expireCookie = useCookie('token_expire')
+  const clearTokens = async () => {
+    const tokenCookie = await getMyCookie('token')
+    const expireCookie = await getMyCookie('token_expire')
     tokenCookie.value = null
     expireCookie.value = null
   }
@@ -139,9 +152,9 @@ export function useTokenApi() {
     options.method = options.method || 'GET'
     options.timeout = 3000
 
-    // 确保useCookie在正确的上下文中调用
-    const langCookie = useCookie('language')
-    console.log(langCookie)
+    // 确保await getMyCookie在正确的上下文中调用
+    const langCookie = await getMyCookie('language')
+    useLogger().info(langCookie)
     const language = langCookie.value || config.defaultLang
 
     let headers = {
@@ -150,7 +163,7 @@ export function useTokenApi() {
       'X-App-Id': config.appId,
     }
 
-    const tokenCookie = useCookie('token')
+    const tokenCookie = await getMyCookie('token')
     const token = tokenCookie.value
     if (!token) {
       const newToken = await getToken()
@@ -178,5 +191,6 @@ export function useTokenApi() {
     refreshToken,
     applyOptions,
     clearTokens,
+    getMyCookie,
   }
 }

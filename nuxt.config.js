@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 console.log('process.argv: ', process.argv)
-console.log('process.env: ', process.env)
+console.log('process.env.NODE_ENV: ', process.env.NODE_ENV)
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
@@ -70,6 +70,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    logLevel: 'verbose', // 可选：'verbose' | 'info' | 'warn' | 'error' | 'silent'
     devProxy: {
       '/api': {
         target: process.env.NUXT_PUBLIC_BASE_URL,

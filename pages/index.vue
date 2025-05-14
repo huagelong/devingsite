@@ -18,7 +18,7 @@ async function handleExperienceClick() {
   }
 }
 
-const res = await test({})
+const res = await useCustomFetch('test.test', '/api/test')
 helloWord.value = res?.data
 
 useSeoMeta({
