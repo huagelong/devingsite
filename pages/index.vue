@@ -17,8 +17,8 @@ async function handleExperienceClick() {
     isLoading.value = false
   }
 }
-
-const res = await useCustomFetch('test.test', '/api/test')
+const event = useNuxtApp().$requestContext?.event
+const res = await useCustomFetch(event, 'test.test', '/api/test')
 helloWord.value = res?.data
 
 useSeoMeta({

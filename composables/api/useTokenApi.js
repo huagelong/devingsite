@@ -1,4 +1,4 @@
-export function useTokenApi() {
+export function useTokenApi(event) {
   async function getConfig() {
     const runtimeConfig = useRuntimeConfig()
     return {
@@ -15,8 +15,8 @@ export function useTokenApi() {
       return token
     }
     else {
-      const { $requestContext } = useNuxtApp()
-      const serverToken = getCookie($requestContext.event, cookieKey)
+      const serverToken = getCookie(event, cookieKey)
+      const token = useCookie(cookieKey)
       token.value = serverToken // 同步到客户端
       return token
     }

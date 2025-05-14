@@ -53,8 +53,8 @@ function handleError(response) {
   }
 }
 
-async function fetch(key, url, options) {
-  const { applyOptions } = useTokenApi()
+async function fetch(event, key, url, options) {
+  const { applyOptions } = useTokenApi(event)
   try {
     options = await applyOptions({ ...options, key })
     let response
@@ -83,8 +83,8 @@ async function fetch(key, url, options) {
   }
 }
 
-export async function useCustomFetch(key, url, options = {}) {
-  const { applyOptions } = useTokenApi()
+export async function useCustomFetch(event, key, url, options = {}) {
+  const { applyOptions } = useTokenApi(event)
   options = await applyOptions({ ...options, key })
   if (options.$) {
     const data = ref(null)
