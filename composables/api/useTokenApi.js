@@ -15,6 +15,7 @@ export function useTokenApi(event) {
       return token
     }
     else {
+      const { getCookie } = await import('h3')
       const serverToken = getCookie(event, cookieKey)
       const token = useCookie(cookieKey)
       token.value = serverToken // 同步到客户端
