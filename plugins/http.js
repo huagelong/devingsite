@@ -176,7 +176,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       get: (url, params, options) => fetch(url, { method: 'GET', params, ...options }),
       post: (url, body, options) => fetch(url, { method: 'POST', body, ...options }),
       put: (url, body, options) => fetch(url, { method: 'PUT', body, ...options }),
-      delete: (url, options) => fetch(url, { method: 'DELETE', ...options }),
+      delete: (url, params, options) => fetch(url, { method: 'DELETE',params,...options }),
       applyOptions: options => applyOptions(options),
     }
   }
