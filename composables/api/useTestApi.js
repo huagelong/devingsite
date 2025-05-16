@@ -1,7 +1,13 @@
 export function useTestApi() {
-  const test = (query) => {
+  const test = (query, options = {}) => {
     const { $http } = useNuxtApp()
-    return $http().get('test.test', '/api/test', query)
+    return $http().get('/api/test', query, options)
   }
-  return { test }
+
+  const test2 = (query, options = {}) => {
+    const { $http } = useNuxtApp()
+    return useAsyncData('test.test', () => $http().get('/api/test', query, options))
+  }
+
+  return { test, test2 }
 }

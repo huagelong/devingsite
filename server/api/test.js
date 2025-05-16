@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker'
+
 export default defineEventHandler(() => {
   const mockData = {
     list: Array.from({ length: 18 }, (_, _i) => ({

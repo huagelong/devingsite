@@ -3,26 +3,18 @@ import { Message } from '@arco-design/web-vue'
 
 const isLoading = ref(false)
 const helloWord = ref('')
-const { test } = useTestApi()
+const { test, test2 } = useTestApi()
+
 async function handleExperienceClick() {
-  try {
-    isLoading.value = true
-    const res = await test({})
-    Message.success(`接口返回：${JSON.stringify(res)}`)
-  }
-  catch (error) {
-    Message.error(`请求失败：${error.message}`)
-  }
-  finally {
-    isLoading.value = false
-  }
+  isLoading.value = true
+  const res = await test({})
+  Message.success(`接口返回：${res.data}`)
+  isLoading.value = false
 }
 
-// const { data } = await test({})
-const { $http } = useNuxtApp()
-const { data } = await useAsyncData('test.test', () => $http().get('test.test', '/api/test', {}))
-helloWord.value = data.value.data
+const { data } = await test2({})
 console.log(data.value.data)
+helloWord.value = data.value.data
 
 useSeoMeta({
   // 页面标题

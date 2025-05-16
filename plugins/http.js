@@ -155,24 +155,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   }
 
-  async function fetch(key, url, options) {
+  async function fetch(url, options) {
     try {
-      options = await applyOptions({ ...options, key })
+      options = await applyOptions({ ...options })
       console.log(`is_client:${process.client}`)
-      // if (process.client) {
-      //   response = await $fetch(url, options)
-      //   if (response?.code !== 0)
-      //     handleError(response)
-      // }
-      // else {
-      //   const { data } = await useFetch(url, {
-      //     ...options,
-      //     transform: res => ({ ...res, fetchedAt: new Date() }),
-      //   })
-      //   response = data.value
-      //   if (response?.code !== 0)
-      //     handleError(response)
-      // }
       const response = await $fetch(url, options)
       if (response?.code !== 0)
         handleError(response)
@@ -187,10 +173,11 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const http = () => {
     return {
-      get: (key, url, params, options) => fetch(key, url, { method: 'GET', params, ...options }),
-      post: (key, url, body, options) => fetch(key, url, { method: 'POST', body, ...options }),
-      put: (key, url, body, options) => fetch(key, url, { method: 'PUT', body, ...options }),
-      delete: (key, url, options) => fetch(key, url, { method: 'DELETE', ...options }),
+      get: (url, params, options) => fetch(url, { method: 'GET', params, ...options }),
+      post: (url, body, options) => fetch(url, { method: 'POST', body, ...options }),
+      put: (url, body, options) => fetch(url, { method: 'PUT', body, ...options }),
+      delete: (url, options) => fetch(url, { method: 'DELETE', ...options }),
+      applyOptions: options => applyOptions(options),
     }
   }
 
