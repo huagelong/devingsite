@@ -17,9 +17,12 @@ async function handleExperienceClick() {
     isLoading.value = false
   }
 }
-const event = useNuxtApp().$requestContext?.event
-const res = await useCustomFetch(event, 'test.test', '/api/test')
-helloWord.value = res?.data
+
+// const { data } = await test({})
+const { $http } = useNuxtApp()
+const { data } = await useAsyncData('test.test', () => $http().get('test.test', '/api/test', {}))
+helloWord.value = data.value.data
+console.log(data.value.data)
 
 useSeoMeta({
   // 页面标题
