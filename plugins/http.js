@@ -155,35 +155,39 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   }
 
-  async function fetch(url, options) {
+  async function fetch(url, options = {}) {
     if (options.$) {
-      return await fetchWith(url, options)
+      return await fetch$(url, options)
     }
     else {
-      const key = options?.key || `fetch_${url.replace(/[^a-z0-9]/gi, '_')}`
-      options = await applyOptions({ ...options })
-      const response = await useAsyncData(key, () => $fetch(url, options))
-      return response
+      // 检查组件是否已挂载
+      const nuxtApp = useNuxtApp()
+      const isMounted = nuxtApp.isHydrating === false
+
+      // 组件已挂载，直接使用 $fetch
+      if (isMounted) {
+        return await fetch$(url, options)
+      }
+      // 组件未挂载，使用 useAsyncData
+      else {
+        const key = options?.key || `fetch_${url.replace(/[^a-z0-9]/gi, '_')}`
+        options = await applyOptions({ ...options })
+        return await useAsyncData(key, () => $fetch(url, options))
+      }
     }
   }
 
   async function fetch$(url, options) {
-    options.$ = true
-    return await fetch(url, options)
-  }
-
-  async function fetchWith(url, options) {
-    try {
-      options = await applyOptions({ ...options })
-      const response = await $fetch(url, options)
-      if (response?.code !== 0)
-        handleError(response)
-      return response
-    }
-    catch (error) {
-      console.error('请求异常:', error)
-      handleError({ code: 50, message: error.message })
-      return null
+    options = await applyOptions({ ...options })
+    const response = await $fetch(url, options)
+    return {
+      data: ref(response),
+      pending: ref(false),
+      error: ref(null),
+      refresh: async () => {
+        const newResponse = await $fetch(url, options)
+        return newResponse
+      },
     }
   }
 
