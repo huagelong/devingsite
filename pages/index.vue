@@ -7,8 +7,8 @@ const { test, test2 } = useTestApi()
 
 async function handleExperienceClick() {
   isLoading.value = true
-  const res = await test({})
-  Message.success(`接口返回：${res.data}`)
+  const { data } = await test({})
+  Message.success(`接口返回：${data.value.data}`)
   isLoading.value = false
 }
 

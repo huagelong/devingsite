@@ -1,9 +1,9 @@
 export function isClient() {
-  return typeof window !== 'undefined'
+  return import.meta.client
 }
 
 export function isServer() {
-  return !isClient()
+  return import.meta.server
 }
 
 export function isDev() {

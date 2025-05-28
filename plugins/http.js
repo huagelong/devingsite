@@ -33,13 +33,13 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
     const signatureParams = await generateSignature(config.appSecret)
     if (!signatureParams) {
-      if (process.client) {
+      if (useHelper.isClient()) {
         const Arco = await import('@arco-design/web-vue')
         Arco.Message.error('签名生成失败')
         return null
       }
     }
-    const language = langCookie || defaultLang
+    const language = langCookie.value || config.defaultLang
     const response = await $fetch('/api/getToken', {
       baseURL: config.baseURL,
       method: 'GET',
@@ -62,7 +62,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   async function refreshToken(currentToken) {
     const config = getConfig()
-    const language = langCookie || config.defaultLang
+    const language = langCookie.value || config.defaultLang
     const response = await $fetch('/api/refreshToken', {
       baseURL: config.baseURL,
       method: 'GET',
@@ -90,7 +90,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     options.timeout = 3000
 
     // 确保await getMyCookie在正确的上下文中调用
-    const language = langCookie || config.defaultLang
+    const language = langCookie.value || config.defaultLang
 
     let headers = {
       'accept': 'application/json',
@@ -108,7 +108,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       headers.Authorization = `Bearer ${token}`
     }
 
-    if (process.server) {
+    if (useHelper.isServer()) {
       const serverHeaders = useRequestHeaders(['referer', 'cookie'])
       headers = { ...headers, ...serverHeaders }
     }
@@ -120,7 +120,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   function handleError(response) {
     // 带上下文的错误显示
     const showError = async (text) => {
-      if (process.client) {
+      if (useHelper.isClient()) {
         const Arco = await import('@arco-design/web-vue')
         Arco.Message.error(text || '未知错误')
       }
@@ -156,9 +156,25 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   async function fetch(url, options) {
+    if (options.$) {
+      return await fetchWith(url, options)
+    }
+    else {
+      const key = options?.key || `fetch_${url.replace(/[^a-z0-9]/gi, '_')}`
+      options = await applyOptions({ ...options })
+      const response = await useAsyncData(key, () => $fetch(url, options))
+      return response
+    }
+  }
+
+  async function fetch$(url, options) {
+    options.$ = true
+    return await fetch(url, options)
+  }
+
+  async function fetchWith(url, options) {
     try {
       options = await applyOptions({ ...options })
-      console.log(`is_client:${process.client}`)
       const response = await $fetch(url, options)
       if (response?.code !== 0)
         handleError(response)
@@ -176,7 +192,11 @@ export default defineNuxtPlugin((nuxtApp) => {
       get: (url, params, options) => fetch(url, { method: 'GET', params, ...options }),
       post: (url, body, options) => fetch(url, { method: 'POST', body, ...options }),
       put: (url, body, options) => fetch(url, { method: 'PUT', body, ...options }),
-      delete: (url, params, options) => fetch(url, { method: 'DELETE',params,...options }),
+      delete: (url, params, options) => fetch(url, { method: 'DELETE', params, ...options }),
+      get$: (url, params, options) => fetch$(url, { method: 'GET', params, ...options }),
+      post$: (url, body, options) => fetch$(url, { method: 'POST', body, ...options }),
+      put$: (url, body, options) => fetch$(url, { method: 'PUT', body, ...options }),
+      delete$: (url, params, options) => fetch$(url, { method: 'DELETE', params, ...options }),
       applyOptions: options => applyOptions(options),
     }
   }
