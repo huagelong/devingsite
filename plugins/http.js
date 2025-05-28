@@ -157,7 +157,16 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   async function fetch(url, options = {}) {
     if (options.$) {
-      return await fetch$(url, options)
+      const response = await fetch$(url, options)
+      return {
+        data: ref(response),
+        pending: ref(false),
+        error: ref(null),
+        refresh: async () => {
+          const newResponse = await fetch$(url, options)
+          return newResponse
+        },
+      }
     }
     else {
       // 检查组件是否已挂载
@@ -166,7 +175,16 @@ export default defineNuxtPlugin((nuxtApp) => {
 
       // 组件已挂载，直接使用 $fetch
       if (isMounted) {
-        return await fetch$(url, options)
+        const response = await fetch$(url, options)
+        return {
+          data: ref(response),
+          pending: ref(false),
+          error: ref(null),
+          refresh: async () => {
+            const newResponse = await $fetch(url, options)
+            return newResponse
+          },
+        }
       }
       // 组件未挂载，使用 useAsyncData
       else {
@@ -180,15 +198,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   async function fetch$(url, options) {
     options = await applyOptions({ ...options })
     const response = await $fetch(url, options)
-    return {
-      data: ref(response),
-      pending: ref(false),
-      error: ref(null),
-      refresh: async () => {
-        const newResponse = await $fetch(url, options)
-        return newResponse
-      },
-    }
+    return response
   }
 
   const http = () => {
